@@ -1,10 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { courses } from "@/data/courses";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const searchParams = useSearchParams();
   const courseFromUrl = searchParams.get("course") ?? "";
 
@@ -341,11 +341,19 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+                  className="btn btn-primary flex w-full items-center justify-center gap-3 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isSubmitting
-                    ? "جاري إرسال الطلب..."
-                    : "إرسال طلب التسجيل"}
+                  {isSubmitting ? (
+                    <>
+                      <span
+                        className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                        aria-hidden="true"
+                      />
+                      <span>جاري التسجيل...</span>
+                    </>
+                  ) : (
+                    "إرسال طلب التسجيل"
+                  )}
                 </button>
 
                 <p className="text-center text-xs leading-6 text-[var(--muted-light)]">
@@ -358,5 +366,25 @@ export default function RegisterPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <main>
+          <section className="section-lg">
+            <div className="container">
+              <p className="text-sm text-[var(--muted)]">
+                جاري تحميل صفحة التسجيل...
+              </p>
+            </div>
+          </section>
+        </main>
+      }
+    >
+      <RegisterForm />
+    </Suspense>
   );
 }
